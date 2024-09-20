@@ -1,3 +1,12 @@
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/kubetoolsca/krs-docker-extension)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/kubetoolsca/krs-docker-extension)
+![stars](https://img.shields.io/github/stars/kubetoolsca/krs-docker-extension)
+![forks](https://img.shields.io/github/forks/kubetoolsca/krs-docker-extension)
+![issues](https://img.shields.io/github/issues/kubetoolsca/krs-docker-extension)
+![Twitter](https://img.shields.io/twitter/follow/kubetools?style=social)
+
+
+
 # Krs Extension for Docker Desktop
 
 ![krs_logo](https://github.com/user-attachments/assets/a24f03df-ef85-44c4-a489-ba5c9b0e9352)

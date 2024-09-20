@@ -1,4 +1,4 @@
-IMAGE?=kubetools/krs-docker-extension
+IMAGE?=dminhph/krs-extension
 TAG?=latest
 
 BUILDER=buildx-multi-arch

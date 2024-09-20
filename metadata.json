@@ -1,0 +1,38 @@
+{
+  "icon": "kubetools.svg",
+  "vm": {
+    "composefile": "docker-compose.yml",
+    "exposes": { "socket": "krs-extension.sock" }
+  },
+  "ui": {
+    "dashboard-tab": {
+      "title": "Krs-Extension",
+      "root": "/ui",
+      "src": "index.html",
+      "backend": {
+        "socket": "krs-extension.sock"
+      }
+    }
+  },
+  "host": {
+    "binaries": [
+      {
+        "darwin": [
+          {
+            "path": "/darwin/kubectl"
+          }
+        ],
+        "windows": [
+          {
+            "path": "/windows/kubectl.exe"
+          }
+        ],
+        "linux": [
+          {
+            "path": "/linux/kubectl"
+          }
+        ]
+      }
+    ]
+  }
+}

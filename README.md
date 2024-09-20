@@ -79,7 +79,7 @@ make reset-extension
 
 ## Dockerfile Explanation 
 
-The [Dockerfile](https://github.com/kubetoolsio/krs-dockerx/blob/add-krs-extension/Dockerfile) is divided into three main stages:
+The [Dockerfile](https://github.com/kubetoolsca/krs-dockerx/blob/add-krs-extension/Dockerfile) is divided into three main stages:
 
 ### Stage 1: Backend Service (Go)
 - **Base Image**: golang:1.21-alpine

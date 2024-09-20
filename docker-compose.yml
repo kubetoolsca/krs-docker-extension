@@ -1,6 +1,6 @@
 services:
   krs-extension:
-    image: kubetools/krs-docker-extension
+    image: dminhph/krs-extension
     hostname: krs-extension
     ports:
       - 4999:3986

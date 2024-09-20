@@ -30,9 +30,12 @@ This project is a Docker Desktop extension for KRS(Kubetools Recommender System)
 
 Before you begin, ensure you have the following installed:
 - **Docker Desktop** (for building and running Docker Desktop extensions)
+- Enable Kubernetes 
 - **Node.js**
 - **Go**
 - **Python**
+
+## Enabling Kubernetes on Docker Dashboard
 
 Before you install the Krs Docker Extension, ensure that Kubernetes is enabled using Docker Desktop. 
 Don't forget to select the "Show System containers" option under Docker Desktop > Settings > Kubernetes.

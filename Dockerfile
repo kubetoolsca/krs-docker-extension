@@ -1,3 +1,4 @@
+# Stage 0: Install the backend server
 FROM golang:1.21-alpine AS builder
 ENV CGO_ENABLED=0
 WORKDIR /vm
@@ -10,6 +11,7 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
     go build -trimpath -ldflags="-s -w" -o bin/service
 
+# Stage 1: Install the UI
 FROM --platform=$BUILDPLATFORM node:21.6-alpine3.18 AS client-builder
 WORKDIR /client
 # cache packages in layer
@@ -22,22 +24,44 @@ RUN --mount=type=cache,target=/usr/src/app/.npm \
 COPY client /client
 RUN npm run build
 
-# Final stage with KRS-Extension installation
-FROM python:3.12.5-alpine
+# Stage 3: KRS installation (final image)
+FROM python:3.12-slim-bullseye
 LABEL org.opencontainers.image.title="Krs - Chat with the Kubernetes Cluster" \
     org.opencontainers.image.description="A GenAI-powered Kubetools Recommender System for Kubernetes clusters." \
     org.opencontainers.image.vendor="Kubetools" \
     com.docker.desktop.extension.api.version="0.3.4" \
     com.docker.extension.screenshots="" \
-    com.docker.desktop.extension.icon="https://github.com/user-attachments/assets/a24f03df-ef85-44c4-a489-ba5c9b0e9352" \
-    com.docker.extension.detailed-description="" \
-    com.docker.extension.publisher-url="" \
+    com.docker.desktop.extension.icon="https://github-production-user-asset-6210df.s3.amazonaws.com/313480/365918020-a24f03df-ef85-44c4-a489-ba5c9b0e9352.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20240920%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20240920T130951Z&X-Amz-Expires=300&X-Amz-Signature=8fcb36c65d532650ef6520d1036506ed4348fe4aee773475a13bb290a4bb9564&X-Amz-SignedHeaders=host" \
+    com.docker.extension.detailed-description="Docker Desktop extension for KRS(Kubetools Recommender System) - a Gen-AI powered tool designed to recommend and manage tools for Kubernetes clusters. The extension provides a user-friendly interface for Kubernetes cluster operations such as initialization, scanning, recommendation, and healthcheck for tools, with support for different Kubernetes environments." \
+    com.docker.extension.publisher-url="https://github.com/kubetoolsca/krs-docker-extension" \
     com.docker.extension.additional-urls="" \
     com.docker.extension.categories="" \
     com.docker.extension.changelog=""
 
 # Install required dependencies including curl
-RUN apk add --update --no-cache curl git openssh-client ncurses bash ttyd tini sudo bash-completion docker-cli
+# --no-install-recommends reduce  the size by avoiding installing packages that aren’t technically dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3-pip \
+    build-essential \
+    curl \
+    git \
+    cmake \
+    libjson-c-dev \
+    libwebsockets-dev \
+    openssh-client \
+    bash \
+    tini \
+    sudo \
+    bash-completion \
+    docker.io \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Install ttyd from github
+RUN git clone https://github.com/tsl0922/ttyd.git /ttyd && \
+    cd /ttyd && mkdir build && cd build && \
+    cmake .. && \
+    make && \
+    make install
 
 # Clone the KRS repository
 # Use the --break-system-packages option to bypass the externally managed environment errors
@@ -47,6 +71,7 @@ RUN git clone https://github.com/kubetoolsca/krs.git /krs \
     && chmod +x /usr/local/bin/krs \
     && chmod +x . \
     && chown -R 1000:1000 /krs
+
 # Verify the command is working
 RUN krs --help
 
@@ -79,4 +104,4 @@ RUN chmod +x /sbin/automateKrsHealth.sh
 EXPOSE 57681
 
 # Start ttyd and the service
-CMD ["ttyd", "-W","-p", "7681", "sh", "/sbin/automateKrsHealth.sh"]
+CMD ["ttyd", "-W", "-p", "7681", "sh", "/sbin/automateKrsHealth.sh"]

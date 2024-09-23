@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Button from '@mui/material/Button';
 import logo from './assets/IMG_5496.jpg';
+import './assets/App.css';
 import {
   Stack,
   Box,
@@ -9,6 +10,11 @@ import {
   LinearProgress,
   Typography,
   useTheme,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
+  FormControl,
+  FormLabel,
 } from '@mui/material';
 import { createDockerDesktopClient } from '@docker/extension-api-client';
 import {
@@ -32,6 +38,8 @@ export function App() {
   const [response, setResponse] = useState<string | undefined>();
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
   const [showTerminal, setShowTerminal] = useState<boolean>(false);
+  const [kubeConfig, setKubeConfig] = useState<string>('~/.kube/config');
+  const [kubeOption, setKubeOption] = useState<string>('');
   const ddClient = useDockerDesktopClient();
   const theme = useTheme();
   interface KRSButtonProps {
@@ -65,6 +73,19 @@ export function App() {
     );
   };
 
+  // Handle the change of kubernetes configuration file
+  const handledRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setKubeOption(e.target.value);
+    if (e.target.value) {
+      setKubeConfig('~/.kube/config');
+    }
+  };
+
+  // Handle selection of kube configuration (default - other)
+  const handledOtherConfigChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setKubeConfig(e.target.value);
+  };
+
   return (
     <>
       {isLoading && (
@@ -84,8 +105,7 @@ export function App() {
           <Grid item>
             <LinearProgress />
             <Typography mt={2} color="common.white">
-              Waiting for Krs-Extension to be ready. It may take some seconds if
-              it's the first time.
+              Waiting for Krs-Extension to process. It may take some seconds
             </Typography>
           </Grid>
         </Grid>
@@ -104,16 +124,7 @@ export function App() {
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-            <img
-              src={logo}
-              alt="krs-logo"
-              style={{
-                width: '80px', // Adjust the size of the logo as needed
-                height: '80px',
-                marginRight: '8px', // Space between the logo and text
-                borderRadius: '50%',
-              }}
-            />
+            <img src={logo} alt="krs-logo" className="krs-logo" />
             <Typography
               variant="h3"
               color="common.white"
@@ -127,8 +138,8 @@ export function App() {
             clusters.
           </Typography>
 
-          <Grid container spacing={2} sx={{ flexGrow: 1 }}>
-            <Grid item>
+          <Grid container spacing={3}>
+            <Grid item xs={12} lg={2}>
               <Stack
                 alignItems="start"
                 spacing={2}
@@ -147,7 +158,7 @@ export function App() {
                   onClick={async () => {
                     try {
                       setIsLoading(true);
-                      const result = await initKRS(ddClient);
+                      const result = await initKRS(ddClient, kubeConfig);
                       setResponse(
                         typeof result === 'string'
                           ? result
@@ -241,10 +252,12 @@ export function App() {
                   label="Exit"
                   onClick={async () => {
                     try {
+                      setIsLoading(true);
                       await krsExit(ddClient);
                       setResponse('Krs services closed safely.');
                       setIsInitialized(false);
                       setShowTerminal(false);
+                      setIsLoading(false);
                     } catch (error: any) {
                       setResponse(error.message || 'An error occurred');
                     }
@@ -256,41 +269,96 @@ export function App() {
 
             {/* Conditionally render TextField or Terminal */}
             {!showTerminal ? (
-              <Grid item xs={12} lg={10}>
-                <TextField
-                  sx={{
-                    flexGrow: 1,
-                    width: '100%',
-                    height: '100%',
-                    mt: 4,
-                    '& .MuiOutlinedInput-root': {
-                      fontFamily: 'monospace',
-                      // Conditional background and text colors based on the theme mode
-                      backgroundColor:
-                        theme.palette.mode === 'light' ? '#ffffff' : '#000000', // White for light mode, black for dark
-                      color:
-                        theme.palette.mode === 'light' ? '#000000' : '#ffffff', // Black text for light mode, white text for dark
-                    },
-                  }}
-                  InputProps={{
-                    readOnly: true, // Makes the TextField read-only, no need to use 'disabled'
-                  }}
-                  multiline
-                  variant="outlined"
-                  minRows={5}
-                  value={
-                    typeof response === 'string'
-                      ? response
-                      : JSON.stringify(response, null, 2)
-                  }
-                />
-              </Grid>
+              <>
+                <Grid item xs={12} lg={10} sx={{ width: '100%', mt: 3 }}>
+                  <Grid container>
+                    <Grid item xs={12} lg={10}>
+                      <FormControl>
+                        <FormLabel id="demo-row-radio-buttons-group-label">
+                          Your Kubernetes Config Path
+                        </FormLabel>
+                        <RadioGroup
+                          row
+                          aria-labelledby="demo-row-radio-buttons-group-label"
+                          name="row-radio-buttons-group"
+                          onChange={handledRadioChange}
+                        >
+                          <FormControlLabel
+                            value="default"
+                            control={<Radio sx={{ color: 'white' }} />} // Set radio color to white
+                            label={
+                              <span className="radio-text-color">Default</span> // Label text in white
+                            }
+                          />
+                          <FormControlLabel
+                            value="other"
+                            control={<Radio sx={{ color: 'white' }} />} // Set radio color to white
+                            label={
+                              <span className="radio-text-color">Other</span> // Label text in white
+                            }
+                          />
+                          {kubeOption === 'other' && (
+                            <TextField
+                              value={kubeConfig}
+                              onChange={handledOtherConfigChange}
+                              placeholder="Enter config path"
+                              sx={{ ml: 2, color: 'black' }} // Add margin-left and set text color to black
+                              InputProps={{
+                                style: { color: 'black' }, // Set input text color to black
+                              }}
+                            />
+                          )}
+                        </RadioGroup>
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} lg={11}>
+                      <TextField
+                        sx={{
+                          flexGrow: 1,
+                          width: '100%',
+                          height: '100%',
+                          mt: 2,
+                          '& .MuiOutlinedInput-root': {
+                            fontFamily: 'monospace',
+                            // Conditional background and text colors based on the theme mode
+                            backgroundColor:
+                              theme.palette.mode === 'light'
+                                ? '#ffffff'
+                                : '#000000', // White for light mode, black for dark
+                            color:
+                              theme.palette.mode === 'light'
+                                ? '#000000'
+                                : '#ffffff', // Black text for light mode, white text for dark
+                          },
+                        }}
+                        InputProps={{
+                          readOnly: true, // Makes the TextField read-only, no need to use 'disabled'
+                        }}
+                        multiline
+                        variant="outlined"
+                        minRows={5}
+                        value={
+                          typeof response === 'string'
+                            ? response
+                            : JSON.stringify(response, null, 2)
+                        }
+                      />
+                    </Grid>
+                  </Grid>
+                </Grid>
+              </>
             ) : (
-              <Box display="flex" flex={1} width="100%" sx={{ mt: 6, ml: 3 }}>
+              <Box
+                display="flex"
+                flex={1}
+                width="100%"
+                sx={{ mt: 6, ml: 3, minHeight: '100vh' }}
+              >
                 <iframe
                   src="http://localhost:57681/"
                   width="100%"
                   height="100%"
+                  title="Interactive Terminal for KRS health"
                 />
               </Box>
             )}

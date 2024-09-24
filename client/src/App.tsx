@@ -302,9 +302,16 @@ export function App() {
                               value={kubeConfig}
                               onChange={handledOtherConfigChange}
                               placeholder="Enter config path"
-                              sx={{ ml: 2, color: 'black' }} // Add margin-left and set text color to black
+                              sx={{
+                                ml: 2,
+                              }} // Add margin-left and set text color to black
                               InputProps={{
-                                style: { color: 'black' }, // Set input text color to black
+                                style: {
+                                  color:
+                                    theme.palette.mode === 'light'
+                                      ? '#000000'
+                                      : '#ffffff',
+                                }, // Set input text color to black
                               }}
                             />
                           )}

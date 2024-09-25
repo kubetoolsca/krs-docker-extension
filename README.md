@@ -1,11 +1,3 @@
-![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/kubetoolsca/krs-docker-extension)
-![stars](https://img.shields.io/github/stars/kubetoolsca/krs-docker-extension)
-![forks](https://img.shields.io/github/forks/kubetoolsca/krs-docker-extension)
-![issues](https://img.shields.io/github/issues/kubetoolsca/krs-docker-extension)
-![Twitter](https://img.shields.io/twitter/follow/kubetools?style=social)
-
-
-
 # Krs Extension for Docker Desktop
 
 ![krs_logo](https://github.com/user-attachments/assets/a24f03df-ef85-44c4-a489-ba5c9b0e9352)
@@ -24,18 +16,14 @@ This project is a Docker Desktop extension for KRS(Kubetools Recommender System)
 5. [User Interface (UI)](#user-interface-ui)
 6. [Running the KRS Commands](#running-the-krs-commands)
 7. [Handling Kubernetes Configurations](#handling-kubernetes-configurations)
-8. [Handling Additional Configuration Requirements for Different Kubernetes Clusters](#handling-additional-configuration-requirements-for-different-kubernetes-clusters)
 
 ## Prerequisite
 
 Before you begin, ensure you have the following installed:
 - **Docker Desktop** (for building and running Docker Desktop extensions)
-- Enable Kubernetes 
 - **Node.js**
 - **Go**
 - **Python**
-
-## Enabling Kubernetes on Docker Dashboard
 
 Before you install the Krs Docker Extension, ensure that Kubernetes is enabled using Docker Desktop. 
 Don't forget to select the "Show System containers" option under Docker Desktop > Settings > Kubernetes.
@@ -90,7 +78,7 @@ make reset-extension
 
 ## Dockerfile Explanation 
 
-The [Dockerfile](https://github.com/kubetoolsca/krs-dockerx/blob/add-krs-extension/Dockerfile) is divided into three main stages:
+The [Dockerfile](https://github.com/kubetoolsio/krs-dockerx/blob/add-krs-extension/Dockerfile) is divided into three main stages:
 
 ### Stage 1: Backend Service (Go)
 - **Base Image**: golang:1.21-alpine
@@ -121,6 +109,15 @@ The Docker extension provides a graphical user interface (GUI) that allows users
     - ``krs exit``: Ends krs services safely and deletes all state files from system. Removes all cached data. (**WORKING**) ✅
 
 ## Running the KRS Commands
+### Step 0: Specifying your Kubernetes Configuration path
+
+This is the first step in starting your work with KRS. You will be asked to specify your local Kubernetes Configuration path. As a default, the path is ``~/.kube/config``. You would not need to specify the path if you did not make any changes.
+
+![alt text](images/image8.png)
+
+- **Default**: ``~/.kube/config``
+- **Other**: The path to your Kubernetes Configuration file.
+
 ### Step 1: Starting the KRS-EXTENSION Container
 
 The `krs` commands are executed inside a Docker container. This container is started in detached mode and can run commands via exec:
@@ -204,8 +201,6 @@ export const krsExit = async (ddClient: v1.DockerDesktopClient) => {
 ## Handling Kubernetes Configurations
 The Docker extension dynamically handles various Kubernetes configurations by mounting the `~/.kube/config` file from the host system into the container. This file contains the necessary configurations to connect to the local Kubernetes clusters.
 
-## Handling Additional Configuration Requirements for Different Kubernetes Clusters
-Different Kubernetes clusters may require additional configuration, such as specific authentication methods or additional certificate files. 
 
 
 

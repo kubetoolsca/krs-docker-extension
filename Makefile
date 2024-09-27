@@ -15,7 +15,7 @@ install-extension: build-extension ## Install the extension
 update-extension: build-extension ## Update the extension
 	docker extension update $(IMAGE):$(TAG)
 
-debug-extension: build-extension## Debug extension
+debug-extension: ## Debug extension
 	docker extension dev debug $(IMAGE):$(TAG)
 
 reset-extension: ## Turn off debug mode

@@ -52,6 +52,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     bash \
     tini \
     sudo \
+    vim \
     bash-completion \
     docker.io \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -99,6 +100,9 @@ COPY --from=client-builder /client/dist /ui
 # Copy the script to automate the krs health command to the container
 COPY automateKrsHealth.sh /sbin/
 RUN chmod +x /sbin/automateKrsHealth.sh
+
+COPY fix-kubeconfig.sh /root/
+RUN chmod +x /root/fix-kubeconfig.sh
 
 # Expose port for ttyd (for interactive terminal)
 EXPOSE 57681

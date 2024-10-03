@@ -106,6 +106,7 @@ The Docker extension provides a graphical user interface (GUI) that allows users
     - ``krs namespaces``: Lists all the namespaces. (**WORKING**) ✅
     - ``krs pods``: Lists all the pods with namespaces, or lists pods under a specified namespace. (**WORKING**) ✅
     - ``krs health``: Starts an interactive terminal using an LLM of your choice to detect and fix issues with your cluster. (**WORKING**) ✅
+    - ``krs export``: Exports pod info with logs and events. (**WORKING**) ✅
     - ``krs exit``: Ends krs services safely and deletes all state files from system. Removes all cached data. (**WORKING**) ✅
 
 ## Running the KRS Commands
@@ -155,7 +156,7 @@ export const krsScan = async (ddClient: v1.DockerDesktopClient) => {
 This command scans the cluster and generates a table of recommended tools from our ranking database and their CNCF project status.
 ``` typescript 
 export const krsRecommend = async (ddClient: v1.DockerDesktopClient) => {
-  // Ensure the container is running, and execute "krs scan" inside the container
+  // Ensure the container is running, and execute "krs recommend" inside the container
 };
 ```
 
@@ -164,7 +165,7 @@ export const krsRecommend = async (ddClient: v1.DockerDesktopClient) => {
 This command lists all the namespaces.
 ``` typescript 
 export const krsNamespaces = async (ddClient: v1.DockerDesktopClient) => {
-  // Ensure the container is running, and execute "krs scan" inside the container
+  // Ensure the container is running, and execute "krs namespaces" inside the container
 };
 ```
 
@@ -173,7 +174,7 @@ export const krsNamespaces = async (ddClient: v1.DockerDesktopClient) => {
 This command lists all the pods with namespaces, or lists pods under a specified namespace.
 ``` typescript 
 export const krsPods = async (ddClient: v1.DockerDesktopClient) => {
-  // Ensure the container is running, and execute "krs scan" inside the container
+  // Ensure the container is running, and execute "krs pods" inside the container
 };
 ```
 
@@ -182,19 +183,31 @@ export const krsPods = async (ddClient: v1.DockerDesktopClient) => {
 This command starts an interactive terminal using an LLM of your choice to detect and fix issues with your cluster.
 ``` typescript 
 export const krsHealth = async (ddClient: v1.DockerDesktopClient) => {
-  // Ensure the container is running, and execute "krs scan" inside the container
+  // Ensure the container is running, and execute "krs health" inside the container
 };
 ```
 
 This command will allow you to interact with your cluster.
 
-### Step 7: Running the ``krs exit`` Command
+### Step 7: Running the ``krs export`` Command
+![alt text](images/image9.png)
+This command exports pod info with logs and events.
+
+``` typescript 
+export const krsExport = async (ddClient: v1.DockerDesktopClient) => {
+  // Ensure the container is running, and execute "krs export" inside the container
+};
+```
+
+This command will export the pod information with logs and events inside the running container and copy it to your home directory. 
+
+### Step 8: Running the ``krs exit`` Command
 ![alt text](images/image7.png)
 This command ends krs services safely and deletes all state files from system. Removes all cached data.
 
 ``` typescript 
 export const krsExit = async (ddClient: v1.DockerDesktopClient) => {
-  // Ensure the container is running, and execute "krs scan" inside the container
+  // Ensure the container is running, and execute "krs exit" inside the container
 };
 ```
 

@@ -25,6 +25,7 @@ import {
   krsExit,
   krsHealth,
   krsPods,
+  krsExport
 } from './helper/krs-helpers';
 
 const client = createDockerDesktopClient();
@@ -243,6 +244,21 @@ export function App() {
                     } catch (error: any) {
                       setResponse(error.message || 'An error occurred');
                     }
+                  }}
+                  disabled={!isInitialized}
+                />
+
+                {/* krs export button */}
+                <KRSButton
+                  label="Export"
+                  onClick={async () => {
+                    const result = await krsExport(ddClient);
+                    setResponse(
+                      typeof result === 'string'
+                        ? result
+                        : JSON.stringify(result, null, 2),
+                    ); // Safeguard response as string
+                    setShowTerminal(false);
                   }}
                   disabled={!isInitialized}
                 />

@@ -19,7 +19,7 @@ const checkKubeContext = async (ddClient: v1.DockerDesktopClient) => {
     return context;
   } catch (error: any) {
     console.error('Error checking Kubernetes context: ', error);
-    return "";
+    return '';
   }
 };
 
@@ -37,7 +37,7 @@ const checkMinikubeIp = async (ddClient: v1.DockerDesktopClient) => {
     return ip;
   } catch (error: any) {
     console.error('Error checking Minikube IP: ', error);
-    return "";
+    return '';
   }
 };
 
@@ -172,7 +172,7 @@ export const krsScan = async (ddClient: v1.DockerDesktopClient) => {
     return output?.stdout || 'No output received';
   } catch (error: any) {
     console.error('Error executing krs command:', error);
-    return `Failed to krs scan: ${error.message}`;
+    return `Failed to krs scan: ${error.stderr}`;
   }
 };
 
@@ -199,7 +199,7 @@ export const krsRecommend = async (ddClient: v1.DockerDesktopClient) => {
     return output?.stdout || 'No output received';
   } catch (error: any) {
     console.error('Error executing krs command:', error);
-    return `Failed to krs recommend: ${error.message}`;
+    return `Failed to krs recommend: ${error.stderr}`;
   }
 };
 
@@ -226,7 +226,7 @@ export const krsNamespaces = async (ddClient: v1.DockerDesktopClient) => {
     return output?.stdout || 'No output received';
   } catch (error: any) {
     console.error('Error executing krs command:', error);
-    return `Failed to krs namespaces: ${error.message}`;
+    return `Failed to krs namespaces: ${error.stderr}`;
   }
 };
 
@@ -253,7 +253,45 @@ export const krsPods = async (ddClient: v1.DockerDesktopClient) => {
     return output?.stdout || 'No output received';
   } catch (error: any) {
     console.error('Error executing krs command:', error);
-    return `Failed to krs pods: ${error.message}`;
+    return `Failed to krs pods: ${error.stderr}`;
+  }
+};
+
+export const krsExport = async (ddClient: v1.DockerDesktopClient) => {
+  try {
+    // Ensure the container is running
+    await startKrsContainer(ddClient);
+
+    // Run the Docker command using the Docker Desktop API
+    const output = await ddClient.docker.cli.exec('exec', [
+      containerID,
+      'krs',
+      'export',
+    ]);
+
+    // Log the output to see the results
+    console.log('Command executed, output received: ', output);
+
+    if (output?.stderr) {
+      console.error('Error output from krs export:', output.stderr);
+      return `Error: ${output.stderr}`;
+    } else {
+      // Copy the pod info json file from the running container to the host machine
+      try {
+        await ddClient.docker.cli.exec('cp', [
+          `${containerID}:/exported_pod_info.json ~/`,
+        ]);
+      } catch (error: any) {
+        return error;
+      }
+    }
+
+    return output.stdout
+      ? 'Pod info with logs and events exported. Json file saved to your home directory!'
+      : 'No output received';
+  } catch (error: any) {
+    console.error('Error executing krs command:', error);
+    return `Failed to krs export: ${error.stderr}`;
   }
 };
 
@@ -273,7 +311,7 @@ export const krsExit = async (ddClient: v1.DockerDesktopClient) => {
     console.log('Command executed, output received: ', output);
 
     if (output?.stderr) {
-      console.error('Error output from krs recommend:', output.stderr);
+      console.error('Error output from krs exit:', output.stderr);
       return `Error: ${output.stderr}`;
     }
 

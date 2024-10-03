@@ -2,25 +2,106 @@ import { v1 } from '@docker/extension-api-client-types';
 // Declare a variable to store the container ID
 let containerID: string;
 let kubeConfigPath: string;
+let currentContext: any;
+/**
+ * Check the Kubernetes context
+ * @returns the current Kubernetes context
+ */
+const checkKubeContext = async (ddClient: v1.DockerDesktopClient) => {
+  try {
+    const output = await ddClient.extension.host?.cli.exec('kubectl', [
+      'config',
+      'current-context',
+    ]);
+
+    const context = output?.stdout.trim();
+    console.log('Current Kubernetes context: ', context);
+    return context;
+  } catch (error: any) {
+    console.error('Error checking Kubernetes context: ', error);
+    return "";
+  }
+};
+
+const checkMinikubeIp = async (ddClient: v1.DockerDesktopClient) => {
+  try {
+    const output = await ddClient.extension.host?.cli.exec('kubectl', [
+      'get',
+      'node',
+      'minikube',
+      '-o',
+      `jsonpath='{.status.addresses[?(@.type=="InternalIP")].address}'`,
+    ]);
+    const ip = output?.stdout.trim();
+    console.log('Current Minikube IP: ', ip);
+    return ip;
+  } catch (error: any) {
+    console.error('Error checking Minikube IP: ', error);
+    return "";
+  }
+};
 
 export const startKrsContainer = async (ddClient: v1.DockerDesktopClient) => {
   try {
+    // Check the current Kubernetes context before starting the container
+    currentContext = await checkKubeContext(ddClient);
+    console.log(currentContext);
     if (!containerID) {
-      // Start the container in detached mode
-      const output = await ddClient.docker.cli.exec('run', [
-        '-d', // Detached mode to keep the container running
-        '--network',
-        'host', // Add the --network host option
-        '-v', // Volume flag
-        `${kubeConfigPath}:/root/.kube/config`, // Mount the local ~/.kube/config to the container's /root/.kube/config
-        'dminhph/krs-extension:latest', // Docker image to run
-        'sleep',
-        'infinity',
-      ]);
+      let output: any;
+
+      if (currentContext == 'minikube') {
+        // Start the container in detached mode
+        output = await ddClient.docker.cli.exec('run', [
+          '-d', // Detached mode to keep the container running
+          '--network',
+          'host', // Add the --network host option
+          '-v', // Volume flag
+          `${kubeConfigPath}:/root/.kube/config`, // Mount the local ~/.kube/config to the container's /root/.kube/config
+          '-v',
+          `~/.minikube:/root/.minikube`,
+          'dminhph/krs-extension:latest', // Docker image to run
+          'sleep',
+          'infinity',
+        ]);
+      } else {
+        // Start the container in detached mode
+        output = await ddClient.docker.cli.exec('run', [
+          '-d', // Detached mode to keep the container running
+          '--network',
+          'host', // Add the --network host option
+          '-v', // Volume flag
+          `${kubeConfigPath}:/root/.kube/config`, // Mount the local ~/.kube/config to the container's /root/.kube/config
+          'dminhph/krs-extension:latest', // Docker image to run
+          'sleep',
+          'infinity',
+        ]);
+      }
       containerID = output.stdout.trim();
       console.log('Container started with ID: ', containerID);
-    }
 
+      // Execute the shell script inside the container
+      if (currentContext == 'minikube') {
+        const minikubeIp = await checkMinikubeIp(ddClient);
+        console.log(minikubeIp);
+        const execScriptOutput = await ddClient.docker.cli.exec('exec', [
+          containerID,
+          'sh',
+          `/root/fix-kubeconfig.sh ${minikubeIp}`,
+        ]);
+
+        if (execScriptOutput.stderr) {
+          console.error(
+            'Error executing the script: ',
+            execScriptOutput.stderr,
+          );
+        } else {
+          console.log(
+            'Script executed successfully: ',
+            execScriptOutput.stdout,
+          );
+        }
+      }
+    }
     return containerID;
   } catch (error: any) {
     console.error('Error starting KRS container: ', error);
@@ -33,16 +114,24 @@ export const initKRS = async (
   kubePath: string,
 ) => {
   try {
+    let output: any;
+
+    // Get the Kubernetes Configuration Path
     kubeConfigPath = kubePath;
 
     // Ensure the container is running
     await startKrsContainer(ddClient);
 
     // Run the Docker command using the Docker Desktop API
-    const output = await ddClient.docker.cli.exec('exec', [
+    output = await ddClient.docker.cli.exec('exec', [
       containerID,
       'krs', // Command to run inside the container
       'init', // Arguments to the krs command
+      `${
+        currentContext == 'minikube'
+          ? '--kubeconfig /root/.kube/config_copy'
+          : ''
+      }`,
     ]);
 
     // Log the output to see the results
@@ -56,7 +145,7 @@ export const initKRS = async (
     return output?.stdout || 'No output received';
   } catch (error: any) {
     console.error('Error executing krs command:', error);
-    return `Failed to initialize krs: ${error.message}`;
+    return `Failed to initialize krs: ${error.stderr}`;
   }
 };
 
@@ -191,9 +280,9 @@ export const krsExit = async (ddClient: v1.DockerDesktopClient) => {
     // Stop the running container.
     try {
       await ddClient.docker.cli.exec('stop', [containerID]);
-      containerID=""
+      containerID = '';
     } catch (error: any) {
-      return `Failed to stop the running container: ${error.message}`
+      return `Failed to stop the running container: ${error.message}`;
     }
 
     return output?.stdout || 'No output received';

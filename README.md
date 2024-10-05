@@ -1,6 +1,6 @@
 # Krs Extension for Docker Desktop
 
-![krs_logo](https://github.com/user-attachments/assets/a24f03df-ef85-44c4-a489-ba5c9b0e9352)
+![krs_logo](images/krs-image.png)
 
 
 ## Overview
@@ -30,7 +30,7 @@ Don't forget to select the "Show System containers" option under Docker Desktop 
 
 
 
-<img width="1039" alt="image" src="https://github.com/user-attachments/assets/2edebbca-8581-4e14-92e0-82ca2e942347">
+![alt text](images/kubernetes-setup.png)
 
 
 

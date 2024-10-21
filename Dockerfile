@@ -33,7 +33,7 @@ LABEL org.opencontainers.image.title="Krs - Chat with the Kubernetes Cluster" \
     com.docker.extension.screenshots="[{\"alt\":\"krs-docker-extension UI Design\", \"url\":\"https://github.com/kubetoolsca/krs-docker-extension/blob/main/images/image.png?raw=true\"},\
     {\"alt\":\"krs init\", \"url\":\"https://github.com/kubetoolsca/krs-docker-extension/blob/main/images/image1.png?raw=true\"},\
     {\"alt\":\"krs scan\", \"url\":\"https://github.com/kubetoolsca/krs-docker-extension/blob/main/images/image2.png?raw=true\"}]" \
-    com.docker.desktop.extension.icon="https://github-production-user-asset-6210df.s3.amazonaws.com/313480/365918020-a24f03df-ef85-44c4-a489-ba5c9b0e9352.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20240920%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20240920T130951Z&X-Amz-Expires=300&X-Amz-Signature=8fcb36c65d532650ef6520d1036506ed4348fe4aee773475a13bb290a4bb9564&X-Amz-SignedHeaders=host" \
+    com.docker.desktop.extension.icon="https://raw.githubusercontent.com/kubetoolsca/krs-docker-extension/refs/heads/main/kubetools.svg" \
     com.docker.extension.detailed-description="Docker Desktop extension for KRS(Kubetools Recommender System) - a Gen-AI powered tool designed to recommend and manage tools for Kubernetes clusters. The extension provides a user-friendly interface for Kubernetes cluster operations such as initialization, scanning, recommendation, and healthcheck for tools, with support for different Kubernetes environments." \
     com.docker.extension.publisher-url="https://github.com/kubetoolsca/krs-docker-extension" \
     com.docker.extension.additional-urls="[{\"title\":\"Documentation\",\"url\":\"https://github.com/kubetoolsca/krs-docker-extension/blob/main/README.md\"}]" \

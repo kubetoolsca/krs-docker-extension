@@ -78,6 +78,9 @@ RUN git clone https://github.com/kubetoolsca/krs.git /krs \
 # Verify the command is working
 RUN krs --help
 
+# Install awscli
+RUN pip --no-cache-dir install --upgrade awscli
+
 # Install Kubectl in multiple environments.
 RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl \
     && chmod +x ./kubectl && mv ./kubectl /usr/local/bin/kubectl \

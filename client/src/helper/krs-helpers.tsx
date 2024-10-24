@@ -3,6 +3,7 @@ import { v1 } from '@docker/extension-api-client-types';
 let containerID: string;
 let kubeConfigPath: string;
 let currentContext: any;
+let contextConfigPath: string;
 /**
  * Check the Kubernetes context
  * @returns the current Kubernetes context
@@ -58,7 +59,24 @@ export const startKrsContainer = async (ddClient: v1.DockerDesktopClient) => {
           '-v', // Volume flag
           `${kubeConfigPath}:/root/.kube/config`, // Mount the local ~/.kube/config to the container's /root/.kube/config
           '-v',
-          `~/.minikube:/root/.minikube`,
+          `${
+            contextConfigPath == '' ? '~/.minikube' : contextConfigPath
+          }:/root/.minikube`,
+          'kubetoolsca/krs-docker-extension:0.0.1', // Docker image to run
+          'sleep',
+          'infinity',
+        ]);
+      } else if (currentContext.includes('aws')) {
+        output = await ddClient.docker.cli.exec('run', [
+          '-d', // Detached mode to keep the container running
+          '--network',
+          'host', // Add the --network host option
+          '-v', // Volume flag
+          `${kubeConfigPath}:/root/.kube/config`, // Mount the local ~/.kube/config to the container's /root/.kube/config
+          '-v',
+          `${
+            contextConfigPath == '' ? '~/.aws' : contextConfigPath
+          }:/root/.aws`,
           'kubetoolsca/krs-docker-extension:0.0.1', // Docker image to run
           'sleep',
           'infinity',
@@ -112,6 +130,7 @@ export const startKrsContainer = async (ddClient: v1.DockerDesktopClient) => {
 export const initKRS = async (
   ddClient: v1.DockerDesktopClient,
   kubePath: string,
+  contextPath: string,
 ) => {
   try {
     let output: any;
@@ -119,6 +138,8 @@ export const initKRS = async (
     // Get the Kubernetes Configuration Path
     kubeConfigPath = kubePath;
 
+    // Get the k8s context configuration path
+    contextConfigPath = contextPath;
     // Ensure the container is running
     await startKrsContainer(ddClient);
 
@@ -145,6 +166,13 @@ export const initKRS = async (
     return output?.stdout || 'No output received';
   } catch (error: any) {
     console.error('Error executing krs command:', error);
+    // Stop the running container.
+    try {
+      await ddClient.docker.cli.exec('stop', [containerID]);
+      containerID = '';
+    } catch (error: any) {
+      return `Failed to stop the running container: ${error.message}`;
+    }
     return `Failed to initialize krs: ${error.stderr}`;
   }
 };

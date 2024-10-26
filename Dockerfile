@@ -26,7 +26,7 @@ RUN npm run build
 
 # Stage 3: KRS installation (final image)
 FROM python:3.12-slim-bullseye
-LABEL org.opencontainers.image.title="Krs - Chat with the Kubernetes Cluster" \
+LABEL org.opencontainers.image.title="KRS" \
     org.opencontainers.image.description="A GenAI-powered Kubetools Recommender System for Kubernetes clusters." \
     org.opencontainers.image.vendor="Kubetools" \
     com.docker.desktop.extension.api.version="0.3.4" \

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Button from '@mui/material/Button';
 import logo from './assets/krs-logo.png';
 import './assets/App.css';
@@ -38,7 +38,11 @@ import {
   krsHealth,
   krsPods,
   krsExport,
+  getK8sContexts,
+  setK8sContext,
 } from './helper/krs-helpers';
+
+import KRSButton from './components/KRSButton';
 
 const client = createDockerDesktopClient();
 
@@ -55,41 +59,15 @@ export function App() {
   const [kubeOption, setKubeOption] = useState<string>('');
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [contextConfigPath, setContextConfigPath] = useState<string>('');
-  const [currentContext, setCurrentContext] = useState<string>('');
+  const [currentContext, setCurrentContext] = useState<string>('Kubernetes Context');
   const [showKubeContextTextField, setShowKubeContextTextField] =
     useState<boolean>(false);
   const [showGuideline, setShowGuideline] = useState<boolean>(true);
+
+  const [contexts, setContexts] = useState<string[]>([]);
+
   const ddClient = useDockerDesktopClient();
   const theme = useTheme();
-  interface KRSButtonProps {
-    children?: React.ReactNode;
-    label: string;
-    onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
-    disabled?: boolean;
-  }
-
-  // Reusable Button Component
-  const KRSButton = ({ label, onClick, disabled = false }: KRSButtonProps) => {
-    return (
-      <Button
-        variant="contained"
-        sx={{
-          minWidth: '150px',
-          maxWidth: '180px',
-          color: 'white',
-          '&:hover': {
-            backgroundColor: '#0000FF',
-          },
-          boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.25)', // Soft shadow
-          borderRadiusL: '8px',
-        }}
-        disabled={disabled}
-        onClick={onClick}
-      >
-        {label}
-      </Button>
-    );
-  };
 
   // Handle the change of kubernetes configuration file
   const handledRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -121,7 +99,8 @@ export function App() {
   };
 
   const handleCloseDialog = () => {
-    setOpenDialog(false);
+    setK8sContext(ddClient, currentContext);
+    setOpenDialog(false);    
   };
 
   const handleOtherClick = () => {
@@ -133,6 +112,20 @@ export function App() {
   ) => {
     setContextConfigPath(e.target.value);
   };
+
+  useEffect(() => {
+    const fetchContexts = async () => {
+      try {
+        const result = await getK8sContexts(ddClient);
+        setContexts(result);
+      } catch (error: any) {
+        console.error(error.message);
+      }
+    };
+
+    fetchContexts();
+  }, [ddClient]);
+
   return (
     <>
       {isLoading && (
@@ -202,7 +195,7 @@ export function App() {
           <Stack sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
             <img src={logo} alt="krs-logo" className="krs-logo" />
             <Typography variant="h1" sx={{ fontWeight: 'bold' }}>
-              KRS - Chat with your Kubernetes Cluster
+              KRS
             </Typography>
             <Typography variant="body1" sx={{ mt: 2 }}>
               A GenAI-powered Kubetools Recommender System for Kubernetes
@@ -267,6 +260,14 @@ export function App() {
                   cluster. Follow these steps if you are using Docker Desktop
                   with Kubernetes:
                 </Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                }}
+              >
                 <Typography variant="h4" sx={{ mb: 2 }}>
                   Settings --&gt; Kubernetes --&gt; Select Enable Kubernetes
                 </Typography>
@@ -528,7 +529,7 @@ export function App() {
                                   borderRadiusL: '8px',
                                 }}
                               >
-                                Other K8s Context Config
+                                {currentContext}
                               </Button>
                               <Menu
                                 id="fade-menu"
@@ -540,7 +541,17 @@ export function App() {
                                 onClose={handleClose}
                                 TransitionComponent={Fade}
                               >
-                                <MenuItem
+                                {contexts.map((context) => (
+                                  <>
+                                    <MenuItem
+                                      key={context}
+                                      onClick={() => handleClickOpen(context)}
+                                    >
+                                      {context}
+                                    </MenuItem>
+                                  </>
+                                ))}
+                                {/* <MenuItem
                                   onClick={() => handleClickOpen('Minikube')}
                                 >
                                   Minikube
@@ -549,7 +560,7 @@ export function App() {
                                   onClick={() => handleClickOpen('AWS')}
                                 >
                                   AWS EKS
-                                </MenuItem>
+                                </MenuItem> */}
                               </Menu>
                             </Grid>
                           </Grid>
@@ -599,7 +610,7 @@ export function App() {
                         {'Your Kubernetes Context Configuration folder Path?'}
                       </DialogTitle>
                       <DialogContent>
-                        {currentContext == 'Minikube' ? (
+                        {currentContext == 'minikube' ? (
                           <>
                             <DialogContentText id="alert-dialog-description">
                               As a default, your Minikube configuration will be
@@ -609,14 +620,15 @@ export function App() {
                             </DialogContentText>
                           </>
                         ) : (
-                          <>
-                            <DialogContentText id="alert-dialog-description">
-                              As a default, your AWS configuration will be
-                              stored in <code>~/.aws</code> if you are using{' '}
-                              <strong>Mac</strong>. If you are using other
-                              platforms. Please hit "Other" to specify the path.
-                            </DialogContentText>
-                          </>
+                          <></>
+                          // <>
+                          //   <DialogContentText id="alert-dialog-description">
+                          //     As a default, your AWS configuration will be
+                          //     stored in <code>~/.aws</code> if you are using{' '}
+                          //     <strong>Mac</strong>. If you are using other
+                          //     platforms. Please hit "Other" to specify the path.
+                          //   </DialogContentText>
+                          // </>
                         )}
 
                         {showKubeContextTextField && (

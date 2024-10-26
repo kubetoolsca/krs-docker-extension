@@ -23,7 +23,10 @@ const checkKubeContext = async (ddClient: v1.DockerDesktopClient) => {
     return '';
   }
 };
-
+/**
+ * Check the Minikube IP
+ * @returns the Minikube IP
+ */
 const checkMinikubeIp = async (ddClient: v1.DockerDesktopClient) => {
   try {
     const output = await ddClient.extension.host?.cli.exec('kubectl', [
@@ -39,6 +42,37 @@ const checkMinikubeIp = async (ddClient: v1.DockerDesktopClient) => {
   } catch (error: any) {
     console.error('Error checking Minikube IP: ', error);
     return '';
+  }
+};
+
+export const getK8sContexts = async (ddClient: v1.DockerDesktopClient) => {
+  try {
+    const output = await ddClient.extension.host?.cli.exec('kubectl', [
+      'config',
+      'get-contexts',
+      "--output='name'",
+    ]);
+    const listContext = output?.stdout.trim().split('\n') || [];
+    return listContext;
+  } catch (error: any) {
+    console.error('Error fetching K8s Contexts: ', error.message);
+    return [];
+  }
+};
+
+export const setK8sContext = async (
+  ddClient: v1.DockerDesktopClient,
+  context: string,
+) => {
+  try {
+    await ddClient.extension.host?.cli.exec('kubectl', [
+      'config',
+      'use-context',
+      `${context}`,
+    ]);
+  } catch (error: any) {
+    console.error('Error fetching K8s Contexts: ', error.message);
+    return "";
   }
 };
 

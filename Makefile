@@ -1,5 +1,5 @@
 IMAGE?=kubetoolsca/krs-docker-extension
-TAG?=0.0.2
+TAG?=0.0.3
 
 BUILDER=buildx-multi-arch
 

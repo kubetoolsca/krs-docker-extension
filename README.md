@@ -1,6 +1,6 @@
 # Krs Extension for Docker Desktop
 
-![krs_logo](images/krs-image.png)
+<img src="images/krs-logo.png" alt="krs_logo" width="200" height="200">
 
 
 ## Overview
@@ -9,13 +9,15 @@ This project is a Docker Desktop extension for KRS(Kubetools Recommender System)
 
 ## Table of Contents
 
-1. [Requirements](#requirements)
+1. [Prerequisite](#prerequisite)
 2. [Build and Install the Docker Extension](#build-and-install-the-docker-extension)
 3. [Debug the Docker Extension](#debug-the-docker-extension)
 4. [Dockerfile Explanation](#dockerfile-explanation)
 5. [User Interface (UI)](#user-interface-ui)
 6. [Running the KRS Commands](#running-the-krs-commands)
 7. [Handling Kubernetes Configurations](#handling-kubernetes-configurations)
+8. [Handling Other Kubernetes Contexts](#handling-kubernetes-configurations)
+
 
 ## Prerequisite
 
@@ -40,14 +42,14 @@ Don't forget to select the "Show System containers" option under Docker Desktop 
 In the project root, run the following commands to build the extension:
 
 ```bash
-make build-extension
+$ make build-extension
 ```
 
 ### Step 2: Install the Extension in Docker Desktop
 You can install the built extension using Docker Desktop's command-line interface:
 
 ```bash
-make install-extension
+$ make install-extension
 ```
 
 After installation, you will see the KRS - Kubetools Recommender System extension under Docker Desktop's Extensions tab.
@@ -56,7 +58,7 @@ After installation, you will see the KRS - Kubetools Recommender System extensio
 Whenever you make a change to your extension, you only need to hit the following command. It will help you rebuild the extension and update it:
 
 ```bash
-make update-extension
+$ make update-extension
 ```
 
 ## Debug the Docker Extension
@@ -65,14 +67,14 @@ make update-extension
 In the project root, run the following commands to debug the extension:
 
 ```bash
-make debug-extension
+$ make debug-extension
 ```
 
 ### Step 2: Reset the debug mode
 You can turn off the debug mode by hitting this below command
 
 ```bash
-make reset-extension
+$ make reset-extension
 ```
 
 
@@ -95,7 +97,12 @@ The [Dockerfile](https://github.com/kubetoolsio/krs-dockerx/blob/add-krs-extensi
 - This stage sets up the KRS tool, installs required dependencies, and prepares the service to interact with Kubernetes.
 
 ## User Interface (UI)
+
 ![alt text](images/image.png)
+
+*KRS Instruction Window*
+![alt text](images/image-1.png)
+
 The Docker extension provides a graphical user interface (GUI) that allows users to initialize the Kubernetes environment and run various KRS commands.
 
 - **React-based Frontend**: The UI is built using React and Material-UI.
@@ -114,7 +121,7 @@ The Docker extension provides a graphical user interface (GUI) that allows users
 
 This is the first step in starting your work with KRS. You will be asked to specify your local Kubernetes Configuration path. As a default, the path is ``~/.kube/config``. You would not need to specify the path if you did not make any changes.
 
-![alt text](images/image8.png)
+![alt text](images/image-1.png)
 
 - **Default**: ``~/.kube/config``
 - **Other**: The path to your Kubernetes Configuration file.
@@ -129,9 +136,9 @@ export const startKrsContainer = async (ddClient: v1.DockerDesktopClient) => {
 };
 ```
 
-
 ### Step 2: Running the ``krs init`` Command
-![alt text](images/image1.png)
+
+![alt text](images/image-2.png)
 
 This command initializes the services and loads the scanner.
 
@@ -142,7 +149,9 @@ export const initKRS = async (ddClient: v1.DockerDesktopClient) => {
 ```
 
 ### Step 3: Running the ``krs scan`` Command
-![alt text](images/image2.png)
+
+![alt text](images/image-3.png)
+
 This command scans the cluster and extracts a list of tools that are currently used.
 
 ``` typescript 
@@ -152,7 +161,9 @@ export const krsScan = async (ddClient: v1.DockerDesktopClient) => {
 ```
 
 ### Step 4: Running the ``krs recommend`` Command
-![alt text](images/image3.png)
+
+![alt text](images/image-4.png)
+
 This command scans the cluster and generates a table of recommended tools from our ranking database and their CNCF project status.
 ``` typescript 
 export const krsRecommend = async (ddClient: v1.DockerDesktopClient) => {
@@ -161,8 +172,11 @@ export const krsRecommend = async (ddClient: v1.DockerDesktopClient) => {
 ```
 
 ### Step 5: Running the ``krs namespaces`` Command
-![alt text](images/image4.png)
+
+![alt text](images/image-5.png)
+
 This command lists all the namespaces.
+
 ``` typescript 
 export const krsNamespaces = async (ddClient: v1.DockerDesktopClient) => {
   // Ensure the container is running, and execute "krs namespaces" inside the container
@@ -170,8 +184,11 @@ export const krsNamespaces = async (ddClient: v1.DockerDesktopClient) => {
 ```
 
 ### Step 5: Running the ``krs pods`` Command
-![alt text](images/image5.png)
+
+![alt text](images/image-6.png)
+
 This command lists all the pods with namespaces, or lists pods under a specified namespace.
+
 ``` typescript 
 export const krsPods = async (ddClient: v1.DockerDesktopClient) => {
   // Ensure the container is running, and execute "krs pods" inside the container
@@ -179,8 +196,11 @@ export const krsPods = async (ddClient: v1.DockerDesktopClient) => {
 ```
 
 ### Step 6: Running the ``krs health`` Command
-![alt text](images/image6.png)
+
+![alt text](images/image-7.png)
+
 This command starts an interactive terminal using an LLM of your choice to detect and fix issues with your cluster.
+
 ``` typescript 
 export const krsHealth = async (ddClient: v1.DockerDesktopClient) => {
   // Ensure the container is running, and execute "krs health" inside the container
@@ -190,7 +210,9 @@ export const krsHealth = async (ddClient: v1.DockerDesktopClient) => {
 This command will allow you to interact with your cluster.
 
 ### Step 7: Running the ``krs export`` Command
-![alt text](images/image9.png)
+
+![alt text](images/image-8.png)
+
 This command exports pod info with logs and events.
 
 ``` typescript 
@@ -202,7 +224,9 @@ export const krsExport = async (ddClient: v1.DockerDesktopClient) => {
 This command will export the pod information with logs and events inside the running container and copy it to your home directory. 
 
 ### Step 8: Running the ``krs exit`` Command
-![alt text](images/image7.png)
+
+![alt text](images/image-9.png)
+
 This command ends krs services safely and deletes all state files from system. Removes all cached data.
 
 ``` typescript 
@@ -214,6 +238,35 @@ export const krsExit = async (ddClient: v1.DockerDesktopClient) => {
 ## Handling Kubernetes Configurations
 The Docker extension dynamically handles various Kubernetes configurations by mounting the `~/.kube/config` file from the host system into the container. This file contains the necessary configurations to connect to the local Kubernetes clusters.
 
+## Handling Other Kubernetes Contexts
+The KRS docker extension has been upgraded to support other k8s contexts besides `docker-desktop` such as `Minikube` and `AWS EKS`.
+
+The following guidelines are the steps to setup `Minikube`:
+
+1. Ensure [Minikube](https://minikube.sigs.k8s.io/docs/start/?arch=%2Fmacos%2Farm64%2Fstable%2Fbinary+download) installed
+2. Start Minikube:
+```bash
+$ minikube start
+```
+3. Ensure Minikube is running:
+```bash
+$ minikube status
+```
+
+![alt text](images/image-10.png)
+
+4. Select `Minikube` in a dropdown menu:
+
+![alt text](images/image-11.png)
+
+![alt text](images/image-12.png)
+
+Whenever users select *minikube context*, the `kube/config` file will be updated to have `minikube`, it also requires some configurations for minikube which is located in the `.minikube` folder. Additionally, the KRS docker extension requires that folder to be able to run the tool. As a default, the `minikube` configuration path is `~/.minikube`, but the path might be different in other platforms such as Windows. Therefore, users can select the `Other` button to specify it, otherwise, users can hit the `Default` button. 
+
+![alt text](images/image-13.png)
+
+![alt text](images/image-14.png)
+*Minikube is scanned by KRS*
 
 
 

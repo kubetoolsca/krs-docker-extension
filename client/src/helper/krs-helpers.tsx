@@ -96,7 +96,7 @@ export const startKrsContainer = async (ddClient: v1.DockerDesktopClient) => {
           `${
             contextConfigPath == '' ? '~/.minikube' : contextConfigPath
           }:/root/.minikube`,
-          'kubetoolsca/krs-docker-extension:0.0.1', // Docker image to run
+          'kubetoolsca/krs-docker-extension:0.0.3', // Docker image to run
           'sleep',
           'infinity',
         ]);
@@ -111,7 +111,7 @@ export const startKrsContainer = async (ddClient: v1.DockerDesktopClient) => {
           `${
             contextConfigPath == '' ? '~/.aws' : contextConfigPath
           }:/root/.aws`,
-          'kubetoolsca/krs-docker-extension:0.0.1', // Docker image to run
+          'kubetoolsca/krs-docker-extension:0.0.3', // Docker image to run
           'sleep',
           'infinity',
         ]);
@@ -123,7 +123,7 @@ export const startKrsContainer = async (ddClient: v1.DockerDesktopClient) => {
           'host', // Add the --network host option
           '-v', // Volume flag
           `${kubeConfigPath}:/root/.kube/config`, // Mount the local ~/.kube/config to the container's /root/.kube/config
-          'kubetoolsca/krs-docker-extension:0.0.1', // Docker image to run
+          'kubetoolsca/krs-docker-extension:0.0.3', // Docker image to run
           'sleep',
           'infinity',
         ]);

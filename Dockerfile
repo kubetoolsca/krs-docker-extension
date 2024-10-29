@@ -31,8 +31,8 @@ LABEL org.opencontainers.image.title="KRS" \
     org.opencontainers.image.vendor="Kubetools" \
     com.docker.desktop.extension.api.version="0.3.4" \
     com.docker.extension.screenshots="[{\"alt\":\"krs-docker-extension UI Design\", \"url\":\"https://github.com/kubetoolsca/krs-docker-extension/blob/main/images/image.png?raw=true\"},\
-    {\"alt\":\"krs init\", \"url\":\"https://github.com/kubetoolsca/krs-docker-extension/blob/main/images/image1.png?raw=true\"},\
-    {\"alt\":\"krs scan\", \"url\":\"https://github.com/kubetoolsca/krs-docker-extension/blob/main/images/image2.png?raw=true\"}]" \
+    {\"alt\":\"krs init\", \"url\":\"https://github.com/kubetoolsca/krs-docker-extension/blob/main/images/image.png?raw=true\"},\
+    {\"alt\":\"krs scan\", \"url\":\"https://github.com/kubetoolsca/krs-docker-extension/blob/main/images/image-2.png?raw=true\"}]" \
     com.docker.desktop.extension.icon="https://raw.githubusercontent.com/kubetoolsca/krs-docker-extension/refs/heads/main/kubetools.svg" \
     com.docker.extension.detailed-description="Docker Desktop extension for KRS(Kubetools Recommender System) - a Gen-AI powered tool designed to recommend and manage tools for Kubernetes clusters. The extension provides a user-friendly interface for Kubernetes cluster operations such as initialization, scanning, recommendation, and healthcheck for tools, with support for different Kubernetes environments." \
     com.docker.extension.publisher-url="https://github.com/kubetoolsca/krs-docker-extension" \
